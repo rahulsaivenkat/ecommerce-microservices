@@ -9,3 +9,23 @@ Rules:
 - IF graphify-out/wiki/index.md EXISTS, navigate it instead of reading raw files
 - For cross-module "how does X relate to Y" questions, prefer `graphify query "<question>"`, `graphify path "<A>" "<B>"`, or `graphify explain "<concept>"` over grep — these traverse the graph's EXTRACTED + INFERRED edges instead of scanning files
 - After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
+# Ecommerce Microservices Project
+
+## Stack
+FastAPI, PostgreSQL, Redis, Kafka, Celery, Python 3.11
+
+## Structure
+ecommerce/
+├── services/auth/
+├── services/products/
+├── services/orders/
+├── services/payment/
+├── services/notify/
+├── gateway/
+└── docker-compose.yml
+
+## Rules
+- Always use async/await for database and redis operations
+- Never hardcode secrets, always use environment variables
+- All endpoints prefixed with /api/v1
+- Pydantic v2 syntax only
