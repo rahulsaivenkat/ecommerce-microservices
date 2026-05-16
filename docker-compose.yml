@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  postgres-auth:
+  postgres:
     image: postgres:15
     environment:
       POSTGRES_USER: admin
@@ -10,106 +10,111 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_auth_data:/var/lib/postgresql/data
-    networks:
-      - ecommerce-network
-
-  postgres-products:
-    image: postgres:15
-    environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin123
-      POSTGRES_DB: products_db
-    ports:
-      - "5433:5432"
-    volumes:
-      - postgres_products_data:/var/lib/postgresql/data
-    networks:
-      - ecommerce-network
-
-  postgres-orders:
-    image: postgres:15
-    environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin123
-      POSTGRES_DB: orders_db
-    ports:
-      - "5434:5432"
-    volumes:
-      - postgres_orders_data:/var/lib/postgresql/data
-    networks:
-      - ecommerce-network
-
-  postgres-payment:
-    image: postgres:15
-    environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin123
-      POSTGRES_DB: payment_db
-    ports:
-      - "5435:5432"
-    volumes:
-      - postgres_payment_data:/var/lib/postgresql/data
-    networks:
-      - ecommerce-network
-
-  postgres-notify:
-    image: postgres:15
-    environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin123
-      POSTGRES_DB: notify_db
-    ports:
-      - "5436:5432"
-    volumes:
-      - postgres_notify_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U admin -d auth_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - ecommerce-network
 
   redis:
-    image: redis:latest
+    image: redis:7-alpine
     ports:
       - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - ecommerce-network
 
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.4.0
-    hostname: zookeeper
-    container_name: zookeeper
+  gateway:
+    build: ./gateway
     ports:
-      - "2181:2181"
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    networks:
-      - ecommerce-network
-
-  kafka:
-    image: confluentinc/cp-kafka:7.4.0
-    hostname: kafka
-    container_name: kafka
-    ports:
-      - "9092:9092"
+      - "8000:8000"
     depends_on:
-      - zookeeper
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file: .env
+    networks:
+      - ecommerce-network
+
+  auth:
+    build: ./services/auth
+    ports:
+      - "8001:8001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file: .env
+    networks:
+      - ecommerce-network
+
+  products:
+    build: ./services/products
+    ports:
+      - "8002:8002"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file: .env
+    networks:
+      - ecommerce-network
+
+  orders:
+    build: ./services/orders
+    ports:
+      - "8003:8003"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file: .env
+    networks:
+      - ecommerce-network
+
+  payment:
+    build: ./services/payment
+    ports:
+      - "8004:8004"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file: .env
+    networks:
+      - ecommerce-network
+
+  notify:
+    build: ./services/notify
+    ports:
+      - "8005:8005"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    env_file: .env
     networks:
       - ecommerce-network
 
 volumes:
-  postgres_auth_data:
-  postgres_products_data:
-  postgres_orders_data:
-  postgres_payment_data:
-  postgres_notify_data:
+  postgres_data:
+  redis_data:
 
 networks:
   ecommerce-network:
