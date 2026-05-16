@@ -54,3 +54,12 @@ class UserUpdate(BaseModel):
     """
 
     full_name: Optional[str] = None
+
+
+class LoginRequest(BaseModel):
+    """
+    Pydantic model for login requests.
+    """
+
+    email: EmailStr
+    password: str

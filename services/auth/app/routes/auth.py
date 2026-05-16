@@ -17,7 +17,7 @@ from app.core.security import (
     decode_token,
 )
 from app.models import User, RefreshToken
-from app.schemas import UserCreate, UserResponse, TokenResponse, RefreshRequest
+from app.schemas import UserCreate, UserResponse, TokenResponse, RefreshRequest, LoginRequest
 
 router = APIRouter(prefix="/api/v1/auth", tags=["Auth"])
 settings = get_settings()
@@ -60,20 +60,19 @@ async def register_user(
 
 @router.post("/login", response_model=TokenResponse)
 async def login_for_access_token(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    login_data: LoginRequest,
     db: Annotated[AsyncSession, Depends(get_db)],
 ):
     """
     Authenticates a user and returns access and refresh tokens.
     """
-    result = await db.execute(select(User).where(User.email == form_data.username))
+    result = await db.execute(select(User).where(User.email == login_data.email))
     user = result.scalar_one_or_none()
 
-    if not user or not verify_password(form_data.password, user.hashed_password):
+    if not user or not verify_password(login_data.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Incorrect email or password",
-            headers={"WWW-Authenticate": "Bearer"},
         )
 
     if not user.is_active:
