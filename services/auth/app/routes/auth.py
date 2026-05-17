@@ -80,7 +80,7 @@ async def login_for_access_token(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user"
         )
 
-    access_token = create_access_token(data={"sub": str(user.id)})
+    access_token = create_access_token(data={"sub": str(user.id), "role": user.role})
     refresh_token = create_refresh_token(data={"sub": str(user.id)})
 
     refresh_token_expires_at = datetime.utcnow() + timedelta(
@@ -142,7 +142,7 @@ async def refresh_access_token(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    new_access_token = create_access_token(data={"sub": str(user.id)})
+    new_access_token = create_access_token(data={"sub": str(user.id), "role": user.role})
     return TokenResponse(
         access_token=new_access_token, refresh_token=refresh_request.refresh_token
     )

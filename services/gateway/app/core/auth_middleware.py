@@ -4,7 +4,7 @@ from fastapi import HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials
 from jose import jwt, JWTError
 
-from services.gateway.app.core.config import get_settings
+from app.core.config import get_settings
 
 PUBLIC_ROUTES = [
     ("POST", "/api/v1/auth/register"),

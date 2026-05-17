@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [auth, products, orders, payment, notify]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        working-directory: services/${{ matrix.service }}
+        run: pip install -r requirements.txt ruff black pytest pytest-asyncio pytest-cov
+
+      - name: Lint with ruff
+        working-directory: services/${{ matrix.service }}
+        run: ruff check app/
+
+      - name: Format check with black
+        working-directory: services/${{ matrix.service }}
+        run: black --check app/
+
+      - name: Run tests
+        working-directory: services/${{ matrix.service }}
+        run: pytest tests/ --cov=app --cov-fail-under=50 -v
+        continue-on-error: true

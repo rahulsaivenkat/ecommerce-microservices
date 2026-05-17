@@ -1,0 +1,65 @@
+{
+  "communities": {
+    "0": [
+      "graphify_explain",
+      "graphify_out_graph_report",
+      "graphify_out_wiki_index",
+      "graphify_path",
+      "graphify_query",
+      "graphify_skill",
+      "graphify_update"
+    ]
+  },
+  "cohesion": {
+    "0": 0.29
+  },
+  "gods": [
+    {
+      "id": "graphify_path",
+      "label": "graphify path",
+      "degree": 6
+    },
+    {
+      "id": "graphify_out_wiki_index",
+      "label": "wiki/index.md",
+      "degree": 1
+    },
+    {
+      "id": "graphify_skill",
+      "label": "graphify skill",
+      "degree": 1
+    },
+    {
+      "id": "graphify_query",
+      "label": "graphify query",
+      "degree": 1
+    },
+    {
+      "id": "graphify_explain",
+      "label": "graphify explain",
+      "degree": 1
+    },
+    {
+      "id": "graphify_update",
+      "label": "graphify update",
+      "degree": 1
+    }
+  ],
+  "surprises": [
+    {
+      "source": "graphify path",
+      "target": "wiki/index.md",
+      "source_files": [
+        "AGENTS.md",
+        "graphify-out/wiki/index.md"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "connects across different repos/directories; peripheral node `wiki/index.md` unexpectedly reaches hub `graphify path`"
+    }
+  ],
+  "tokens": {
+    "input": 538,
+    "output": 867
+  }
+}

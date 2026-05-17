@@ -6,8 +6,8 @@ from fastapi import FastAPI, Request, Response, HTTPException, status, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
-from services.gateway.app.core.auth_middleware import verify_jwt, PUBLIC_ROUTES
-from services.gateway.app.routes.proxy import forward_request, client as proxy_client # Import the shared client
+from app.core.auth_middleware import verify_jwt, PUBLIC_ROUTES
+from app.routes.proxy import forward_request, client as proxy_client # Import the shared client
 
 
 @asynccontextmanager

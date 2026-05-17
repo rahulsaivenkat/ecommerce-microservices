@@ -8,6 +8,7 @@ settings = get_settings()
 ROUTES = {
     "/api/v1/auth": settings.AUTH_SERVICE_URL,
     "/api/v1/products": settings.PRODUCTS_SERVICE_URL,
+    "/api/v1/cart": settings.ORDERS_SERVICE_URL,
     "/api/v1/orders": settings.ORDERS_SERVICE_URL,
     "/api/v1/payment": settings.PAYMENT_SERVICE_URL,
     "/api/v1/notify": settings.NOTIFY_SERVICE_URL,
