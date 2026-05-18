@@ -3,27 +3,29 @@
 A production-grade ecommerce backend built with Python and FastAPI, structured as 5 independent microservices communicating via Redis Pub/Sub, secured with JWT authentication, and deployed on AWS EC2 via GitHub Actions CI/CD.
 
 ---
-
 ## Architecture
-Client (Browser / Mobile / Postman)
-│
-▼
-┌───────────────┐
-│  API Gateway  │  ← JWT validation, rate limiting, request routing
-│   port 8000   │
-└───────┬───────┘
-│
-┌───────┴────────────────────────────────────┐
-│       │            │          │            │
-▼       ▼            ▼          ▼            ▼
-[Auth]  [Products]  [Orders]  [Payment]    [Notify]
-8001     8002        8003      8004         8005
-│       │            │          │            │
-▼       ▼            ▼          ▼            ▼
-auth_db prod_db      ord_db    pay_db        ntf_db
-(5 databases inside 1 PostgreSQL instance)
-     Shared: Redis 7 — Cache + Pub/Sub Event Bus
 
+```
+Client (Browser / Mobile / Postman)
+            │
+            ▼
+    ┌───────────────┐
+    │  API Gateway  │  ← JWT validation, rate limiting, request routing
+    │   port 8000   │
+    └───────┬───────┘
+            │
+   ┌────────┼────────────────────────────┐
+   │        │          │        │        │
+   ▼        ▼          ▼        ▼        ▼
+[Auth]  [Products]  [Orders] [Payment] [Notify]
+ 8001     8002        8003     8004      8005
+   │        │          │        │        │
+   ▼        ▼          ▼        ▼        ▼
+auth_db  prod_db    ord_db   pay_db   ntf_db
+      (5 databases inside 1 PostgreSQL instance)
+
+    Shared: Redis 7 — Cache + Pub/Sub Event Bus
+```
 ---
 
 ## Tech Stack
