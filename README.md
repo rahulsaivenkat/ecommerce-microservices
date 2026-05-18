@@ -186,22 +186,29 @@ curl http://localhost:8000/api/v1/products/ \
 | TWILIO_PHONE_NUMBER | Twilio phone number |
 
 ---
-
 ## CI/CD Pipeline
-Push to main
-│
-├── CI Job (runs on every push + PR)
-│   ├── Lint with ruff + black
-│   ├── Run pytest with 60%+ coverage
-│   └── Build Docker image
-│
-└── Deploy Job (push to main only)
-├── SSH into AWS EC2
-├── git pull
-├── docker compose build
-├── docker compose up -d
-└── Run Alembic migrations
 
+```
+Push to main branch
+        │
+        ▼
+┌───────────────────────────────────┐
+│         CI Job (every push)       │
+│  ├── Lint with ruff + black       │
+│  ├── Run pytest (60%+ coverage)   │
+│  └── Build Docker image           │
+└───────────────┬───────────────────┘
+                │ (only if CI passes)
+                ▼
+┌───────────────────────────────────┐
+│        Deploy Job (main only)     │
+│  ├── SSH into AWS EC2             │
+│  ├── git pull origin main         │
+│  ├── docker compose build         │
+│  ├── docker compose up -d         │
+│  └── Run Alembic migrations       │
+└───────────────────────────────────┘
+```
 ---
 
 ## Resume Highlights
