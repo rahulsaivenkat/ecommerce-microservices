@@ -224,18 +224,33 @@ Push to main branch
 - Built **async background tasks** for order auto-cancellation with 15-minute payment timeout
 
 ---
-
 ## Project Structure
+
+```
 ecommerce/
 ├── services/
-│   ├── gateway/        # API Gateway
-│   ├── auth/           # Authentication service
-│   ├── products/       # Product catalog service
-│   ├── orders/         # Orders and cart service
-│   ├── payment/        # Payment service
-│   └── notify/         # Notification service
+│   ├── gateway/          # API Gateway — JWT validation, reverse proxy
+│   ├── auth/             # Authentication — register, login, JWT tokens
+│   ├── products/         # Product catalog — CRUD, Redis caching
+│   ├── orders/           # Cart + Orders — lifecycle, background tasks
+│   ├── payment/          # Payments — Razorpay integration, webhooks
+│   └── notify/           # Notifications — Redis Pub/Sub, email, SMS
+│       └── app/
+│           ├── main.py
+│           ├── models.py
+│           ├── schemas.py
+│           ├── routes/
+│           ├── core/
+│           │   ├── config.py
+│           │   └── database.py
+│           └── Dockerfile
 ├── postgres/
-│   └── init.sql        # Database initialization
-├── docker-compose.yml
-├── .env.example
+│   └── init.sql          # Creates all 5 databases on startup
+├── .github/
+│   └── workflows/
+│       ├── ci.yml        # Lint + test on every push
+│       └── deploy.yml    # Deploy to EC2 on push to main
+├── docker-compose.yml    # Full local dev environment
+├── .env.example          # Environment variables template
 └── README.md
+```
